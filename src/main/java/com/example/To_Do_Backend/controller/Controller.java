@@ -14,41 +14,44 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.To_Do_Backend.entity.Todo;
-import com.example.To_Do_Backend.service.TodoService;
+import com.example.To_Do_Backend.repositery.Repositery;
 
 @RestController
 @CrossOrigin
 public class Controller {
 
     @Autowired
-    private TodoService todoService;
+    Repositery repo;
 
     @GetMapping("/allList")
-    public List<Todo> allTodoList() {
+    public List<Todo> home() {
 
-        return todoService.allTodoList();
+        List<Todo> allTodoList = repo.findAll();
+
+        return allTodoList;
 
     }
 
     @PostMapping("/newTodo")
-    public void createTodo(@RequestBody Todo newTodo) {
-        // Delegate the logic to the service layer
-        todoService.createTodo(newTodo);
+    public void CreateTodo(@RequestBody Todo newTodo) {
+
+        repo.save(newTodo);
+
     }
-@PutMapping("/update/{id}")
-public Todo UpdateTodo(@PathVariable int id, @RequestBody Todo newTodo) {
-    // Fetch the Todo item by ID
-    Todo todo = repo.findById(id).get();
 
-    // Update the Todo content
-    todo.setAddTodo(newTodo.getAddTodo());
-    repo.save(todo);
 
-    // Return the updated Todo
-    return todo;
-}
+    @PutMapping("/update/{id}")
+    public Todo UpdateTodo(@PathVariable int id,@RequestBody Todo newTodo){
+        
 
-@DeleteMapping("/delete/{id}")
+       Todo todo = repo.findById(id).get();
+       todo.setAddTodo(newTodo.getAddTodo());
+        repo.save(todo);
+       return todo;
+
+    }
+
+   @DeleteMapping("/delete/{id}")
 public ResponseEntity<String> deleteTodo(@PathVariable int id) {
     // Check if the entity exists
     Todo todo = repo.findById(id)
@@ -59,5 +62,5 @@ public ResponseEntity<String> deleteTodo(@PathVariable int id) {
 
     // Return a success response
     return ResponseEntity.ok("Todo deleted successfully with id: " + id);
+} 
 }
-

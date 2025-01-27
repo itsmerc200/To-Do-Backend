@@ -3,6 +3,7 @@ package com.example.To_Do_Backend.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,23 +41,27 @@ public class Controller {
 
 
     @PutMapping("/update/{id}")
-    public Todo UpdateTodo(@PathVariable int id){
+    public Todo UpdateTodo(@PathVariable int id,@RequestBody Todo newTodo){
+        
 
        Todo todo = repo.findById(id).get();
-       todo.setAddTodo("good morning");
+       todo.setAddTodo(newTodo.getAddTodo());
         repo.save(todo);
        return todo;
 
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteTodo(@PathVariable  int id){
+   @DeleteMapping("/delete/{id}")
+public ResponseEntity<String> deleteTodo(@PathVariable int id) {
+    // Check if the entity exists
+    Todo todo = repo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Todo not found with id: " + id));
 
-        Todo todo = repo.findById(id).get();
-        repo.delete(todo);
-        // repo.save(todo);
+    // Delete the entity
+    repo.delete(todo);
 
-
-    }
+    // Return a success response
+    return ResponseEntity.ok("Todo deleted successfully with id: " + id);
+}
 
 }
